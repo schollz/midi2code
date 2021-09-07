@@ -1,7 +1,10 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
+	"html/template"
+	"math/rand"
 	"runtime"
 	"time"
 
@@ -60,7 +63,25 @@ var keyMap = map[string]Press{
 	"\n": Press{key: keybd_event.VK_ENTER}, // TODO: for live coding make this shift
 }
 
+func softcut_random_loop() string {
+	start := float64(int((rand.Float64()*100)*100)) / 100
+	duration := float64(int((rand.Float64()*1+0.05)*100)) / 100
+	voice := rand.Intn(6) + 1
+	t := template.Must(template.New("my").Parse("clock.run(function() softcut.loop_start({{.Voice}},{{.Start}}); softcut.loop_end({{.Voice}},{{.Start}}+10); softcut.rec_level({{.Voice}},0.5); softcut.position({{.Voice}},{{.Start}}); clock.sleep({{.Duration}}+0.2); softcut.loop_end({{.Voice}},{{.Start}}+{{.Duration}}); softcut.pos({{.Voice}},{{.Start}}) end)"))
+	var tpl bytes.Buffer
+	err := t.Execute(&tpl, struct {
+		Start    float64
+		Duration float64
+		Voice    int
+	}{start, duration, voice})
+	if err != nil {
+		panic(err)
+	}
+	return tpl.String()
+}
+
 func main() {
+	fmt.Println(softcut_random_loop())
 	fmt.Println("running")
 	kb, err := keybd_event.NewKeyBonding()
 	if err != nil {
