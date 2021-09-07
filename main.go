@@ -60,7 +60,9 @@ var keyMap = map[string]Press{
 	")":  Press{keybd_event.VK_0, true},
 	"-":  Press{key: keybd_event.VK_MINUS},
 	"_":  Press{keybd_event.VK_MINUS, true},
-	"\n": Press{key: keybd_event.VK_ENTER}, // TODO: for live coding make this shift
+	" ":  Press{key: keybd_event.VK_SPACE},
+	"+":  Press{key: keybd_event.VK_EQUAL, shift: true},
+	"\n": Press{key: keybd_event.VK_ENTER, shift: true}, // TODO: for live coding make this shift
 }
 
 func softcut_random_loop() string {
@@ -93,9 +95,9 @@ func main() {
 		time.Sleep(2 * time.Second)
 	}
 
-	line := "softcut.loop_start(1.0)\n"
+	line := ""
 	for i := 0; i < 5; i++ {
-		line = line + line
+		line = line + softcut_random_loop()
 	}
 	fmt.Println(line)
 	// for _, char := range line {
@@ -115,7 +117,7 @@ func main() {
 
 	// test with
 	// for i in {1..10}; do; echo -n "/key" | nc -w 0 -u localhost 8765; sleep 0.2; done
-	addr := "127.0.0.1:8765"
+	addr := "0.0.0.0:8765"
 	d := osc.NewStandardDispatcher()
 	d.AddMsgHandler("/key", func(msg *osc.Message) {
 		s := string(chars[i])
